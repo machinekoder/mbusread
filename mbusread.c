@@ -1,50 +1,27 @@
 //------------------------------------------------------------------------------
-// Copyright (C) 2010, Raditex AB
-// modified by Alexander Rössler 2012
+// Copyright (C) 2012, Alexander Rössler
 // All rights reserved.
 //
-// FreeSCADA 
-// http://www.FreeSCADA.com
-// freescada@freescada.com
 //
 //------------------------------------------------------------------------------
 
-#include <sys/types.h>
-
-#include <err.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <termios.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <time.h>
-
-#include <mbus/mbus-protocol.h>
-#include <mbus/mbus.h>
-#include "mbus_csv.h"
-
-void process_config(char* configfile_name);
-mbus_handle* connect_device(char* device, uint baudrate);
-int request_primary(mbus_handle* handle, uint address);
-int request_secondary(mbus_handle* handle, uint address);
-int receive_frame(mbus_handle* handle, FILE *file, uint address);
-int compress_file(char* filename, char* zip_filename);
-char* generate_filename();
-void log_error(char* error_msg, const char* function_name);
-int join_files(char* old_filename, char* new_filename);
+#include "mbusread.h"
 
 int
 main(int argc, char *argv[])
 {
-  if (argc != 2)
-  {
-      fprintf(stderr, "%s config-file\n", argv[0]);
-      exit(EXIT_FAILURE);
-  }
+    char* fileName = NULL;
+    char c;
+    while ((c = getopt(argc, argv, "f:")) != -1)
+    {
+        if (c == 'f')
+            fileName = optarg;
+    }
 	
-  process_config(argv[1]);
+    if (fileName != NULL)
+        process_config(fileName);
+    else
+        log_error("No config file given", __PRETTY_FUNCTION__);
 }
 
 mbus_handle*
