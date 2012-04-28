@@ -1,0 +1,4 @@
+[Project]
+Name=mbusread
+Manager=KDevCMakeManager
+VersionControl=kdevgit
