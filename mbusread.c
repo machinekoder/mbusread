@@ -12,16 +12,37 @@ main(int argc, char *argv[])
 {
     char* fileName = NULL;
     char c;
-    while ((c = getopt(argc, argv, "f:")) != -1)
+    uint8_t params = 0; //initialize application params
+    
+    while ((c = getopt(argc, argv, "f:x:")) != -1)
     {
         if (c == 'f')
+        {
             fileName = optarg;
+            params |= (1 << PARAM_F);
+        }
+        else if (c == 'x')
+        {
+            fileName = optarg;
+            params |= (1 << PARAM_X);
+        }
     }
 	
-    if (fileName != NULL)
-        process_config(fileName);
-    else
-        log_error("No config file given", __PRETTY_FUNCTION__);
+    if (params & (1 << PARAM_F))        //process config file
+    {
+        if (fileName != NULL)
+            process_config(fileName);
+        else
+            log_error("No config file given", __PRETTY_FUNCTION__);
+    }
+    
+    if (params & (1 << PARAM_X))        //process hexdump
+    {
+        if (fileName != NULL)
+            process_hexdump(fileName);
+        else
+            log_error("No hex file given", __PRETTY_FUNCTION__);
+    }
 }
 
 mbus_handle*
@@ -221,7 +242,7 @@ process_config(char* config_filename)
       }
       else if (n == 1)
       {
-	sscanf(line, "TO %u", &timeout);
+	sscanf(line, "TO %u", &timeout);        //these values are unused yet
       }
       else if (n == 2)
       {
@@ -266,6 +287,49 @@ process_config(char* config_filename)
     log_error("Failed to open config file", __PRETTY_FUNCTION__);
     exit(EXIT_FAILURE);
   }
+}
+
+void process_hexdump (char* hexdumpfile_name)   //from libmbus
+{
+    int fd, len, i;
+    u_char raw_buff[4096], buff[4096], *ptr, *endptr;
+    mbus_frame reply;
+    mbus_frame_data frame_data;
+
+    if ((fd = open(hexdumpfile_name, O_RDONLY, 0)) == -1)
+    {
+        log_error("Failed to open hexdump file", __PRETTY_FUNCTION__);
+        return;
+    }
+
+    bzero(raw_buff, sizeof(raw_buff));
+    len = read(fd, raw_buff, sizeof(raw_buff));
+    close(fd);
+
+    i = 0;
+    ptr    = 0;
+    endptr = raw_buff;
+    while (i < sizeof(buff)-1)
+    {
+        ptr = endptr;
+        buff[i] = (u_char)strtol(ptr, (char **)&endptr, 16);
+        
+        // abort at non hex value 
+        if (ptr == endptr)
+            break;
+           
+        i++;
+    }
+
+    bzero(&reply, sizeof(reply));
+    bzero(&frame_data, sizeof(frame_data));
+
+    mbus_parse(&reply, buff, i);
+    
+    mbus_frame_data_parse(&reply, &frame_data);
+    //mbus_frame_print(&reply);
+    //mbus_frame_data_print(&frame_data);
+    printf("%s", mbus_frame_data_csv(&frame_data, 253));
 }
 
 void 
