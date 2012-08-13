@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------
+﻿//------------------------------------------------------------------------------
 // Copyright (C) 2012, Alexander Rössler
 // All rights reserved.
 //
@@ -19,6 +19,10 @@
 #include <time.h>
 #include <sys/types.h>
 #include <mbus/mbus-protocol.h>
+
+#ifdef WIN32
+typedef unsigned int uint;
+#endif
 
 const char *mbus_data_record_value_and_unit(mbus_data_record* record);
 

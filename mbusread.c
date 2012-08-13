@@ -43,6 +43,12 @@ main(int argc, char *argv[])
         else
             log_error("No hex file given", __PRETTY_FUNCTION__);
     }
+
+    if ((argc == 1) || (params & (1 << PARAM_H)))
+    {
+        fprintf(stdout, "MBusRead\n"
+                "usage: %s -f <config file name> -x <hexdump file name> -h <show this help>", argv[0]);
+    }
 }
 
 mbus_handle*
@@ -302,7 +308,9 @@ void process_hexdump (char* hexdumpfile_name)   //from libmbus
         return;
     }
 
-    bzero(raw_buff, sizeof(raw_buff));
+    //bzero(raw_buff, sizeof(raw_buff));
+    memset(raw_buff,0, sizeof(raw_buff));
+
     len = read(fd, raw_buff, sizeof(raw_buff));
     close(fd);
 
@@ -321,8 +329,10 @@ void process_hexdump (char* hexdumpfile_name)   //from libmbus
         i++;
     }
 
-    bzero(&reply, sizeof(reply));
-    bzero(&frame_data, sizeof(frame_data));
+    //bzero(&reply, sizeof(reply));;
+    memset(&reply,0, sizeof(reply));
+    //bzero(&frame_data, sizeof(frame_data));
+    memset(&frame_data,0, sizeof(frame_data));
 
     mbus_parse(&reply, buff, i);
     

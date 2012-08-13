@@ -1,4 +1,4 @@
-//------------------------------------------------------------------------------
+﻿//------------------------------------------------------------------------------
 // Copyright (C) 2012, Alexander Rössler
 // All rights reserved.
 //
@@ -17,11 +17,11 @@
 
 #define PARAM_F 0
 #define PARAM_X 1
+#define PARAM_H 2
 
-#include <err.h>
+//#include <err.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include <termios.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
