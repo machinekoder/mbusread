@@ -248,9 +248,10 @@ process_config(char* config_filename)
       }
       else if (n == 1)
       {
-	sscanf(line, "TO %u", &timeout);        //these values are unused yet
+    sscanf(line, "TO %u", &timeout);
+    mbus_serial_set_timeout(handle,timeout);
       }
-      else if (n == 2)
+      else if (n == 2) //these values are unused yet
       {
 	sscanf(line, "TB %u", &tb);
       }
